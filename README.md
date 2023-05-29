@@ -73,3 +73,55 @@ systemctl stop atk-qtapp-start.service // 暂时停止 Qt 桌面服务，重启�
 chmod 777 test //赋予测试文件权限
 ./test -platform linuxfb //以 linuxfb 方式运行测试程序
 ```
+## MQTT移植
+### MQTT服务器安装
+* 选择EMQ X作为MQTT的服务器，因为这是个开源平台，并且具有可视化的后台管理，便于开发。EMQ X[下载地址官网](https://www.emqx.com/zh/try?product=enterprise)，EMQ X[使用指南](https://docs.emqx.com/zh/enterprise/v4.4/)
+* 1、下载
+```
+wget https://www.emqx.com/zh/downloads/enterprise/4.4.18/emqx-ee-4.4.18-otp24.3.4.2-1-ubuntu18.04-amd64.zip
+```
+* 2、安装
+```
+unzip emqx-ee-4.4.18-otp24.3.4.2-1-ubuntu18.04-amd64.zip
+```
+* 3、运行
+```
+./emqx/bin/emqx start
+```
+* 4、连接查看
+web端输入http://192.168.6.130:18083，__192.168.6.130为自己的IP，端口默认为18083__
+用户名开始都是admin 密码默认为：pubilc。
+### MQTT.fx客户端连通性测试
+* 1、Broker Address：服务器IP地址
+* 2、Broker Port：1883（本地端口）
+* 3、connect
+### MQTT源码下载
+* 下载的MQTT源码的版本需要和QT版本对应，否则**编译不通过**。[下载地址](https://gitcode.net/mirrors/qt/qtmqtt/-/tree/5.12.9)。
+### MQTT源码移植
+* 1、下载后的MQTT源码文件夹名称为qtmqtt-5.12.9。在环境配置章，QT安装地址为/opt/Qt5.12.9。以下将在这两个个文件夹操作。
+* 2、在/opt/Qt5.12.9/5.12.9/gcc_64/include文件下创建QtMqtt文件夹
+```
+sudo mkdir QtMqtt
+```
+* 3、将复制qtmqtt-5.12.9中的头文件复制到QtMqtt文件夹中
+```
+sudo qtmqtt-5.12.9/src/mqtt/*.h /opt/Qt5.12.9/5.12.9/gcc_64/include/QtMqtt
+```
+* 4、使用QT打开MQTT源码文件夹中的工程，然后点击构建，对源码进行编译，会在qtmqtt-5.12.9同级目录输出编译文件**build-qtmqtt-Desktop_Qt_5_12_9_GCC_64bit-Debug**
+* 5、复制编译文件夹中生成的头文件依赖到qtmqtt-5.12.9/src/mqtt文件夹中
+```
+cp build-qtmqtt-Desktop_Qt_5_12_9_GCC_64bit-Debug/include qtmqtt-5.12.9/src/mqtt -r
+```
+* 6、新建文件夹，用于自己的MQTT工程存放
+```
+mkdir MyMqttServer
+cd MyMqttServer
+```
+* 7、在QT中新建工程，位置为第六步新建的文件夹，工程名称设为MqttServer。
+* 8、将编译生成的库文件夹和qtmqtt-5.12.9/src/mqtt文件夹复制到自己MQTT的QT工程的同级目录
+```
+cp qtmqtt-5.12.9/src/mqtt build-qtmqtt-Desktop_Qt_5_12_9_GCC_64bit-Debug/lib MyMqttServer/MqttServer -r
+```
+* 9、将第八步复制的库文件作为外部库添加到自己的MQTT工程里面。步骤：在QT中右击工程->添加库->选择外部库->添加库文件（MyMqttServer/MqttServer/lib/libQt5Mqtt.so），包含路径（MyMqttServer/MqttServer/lib）。同时取消勾选Mac、Windows，只勾选Linux。
+* 10、在头文件目录(Headers)添加第八步复制的头文件。步骤：右击Header->路径位置为MyMqttServer/MqttServer/mqtt/include/QtMqtt/QtMqttDepends，双击QtMqttDepends文件添加即可。至此，MQTT在Qt平台移植完成。
+
