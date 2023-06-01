@@ -125,3 +125,42 @@ cp qtmqtt-5.12.9/src/mqtt build-qtmqtt-Desktop_Qt_5_12_9_GCC_64bit-Debug/lib MyM
 * 9、将第八步复制的库文件作为外部库添加到自己的MQTT工程里面。步骤：在QT中右击工程->添加库->选择外部库->添加库文件（MyMqttServer/MqttServer/lib/libQt5Mqtt.so），包含路径（MyMqttServer/MqttServer/lib）。同时取消勾选Mac、Windows，只勾选Linux。
 * 10、在头文件目录(Headers)添加第八步复制的头文件。步骤：右击Header->路径位置为MyMqttServer/MqttServer/mqtt/include/QtMqtt/QtMqttDepends，双击QtMqttDepends文件添加即可。至此，MQTT在Qt平台移植完成。
 
+## SQLite3简单介绍
+* sqlite是比较轻量级的数据库，类型为关系型数据库。
+* 基本使用
+* 1、创建数据库
+```
+sqlite3 test.db;     
+sqlite3 数据库名称;
+```
+* 2、查询数据库中的所有表格
+```
+.tables;
+```
+* 3、数据库中创建数据表格
+```
+create table userinfo(username, password);   
+create 类型 数据表格名称(列1, 列2,...);
+```
+* 4、向数据表userinfo中插入一行记录
+```
+insert into userinfo(username, password) value('user1', 123);
+insert into 表格名称(列1, 列2) 需要插入的数据;
+```
+* 5、查询userinfo表中的所有数据
+```
+select * from userinfo;
+select * from 表格名称;
+```
+* 6、更新userinfo表格中指定行的信息，根据where来定位
+```
+update userinfo set password where username='user1';
+update 数据表名称 set 指定列 where 指定行;
+```
+* 7、删除userinfo表格中指定行的信息，根据where来定位
+```
+delete from userinfo where username='user1';
+delete from 数据表名称 where 指定行;
+```
+
+
